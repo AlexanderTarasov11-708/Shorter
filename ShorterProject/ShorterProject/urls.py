@@ -16,6 +16,8 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from django.conf.urls import url
+
+from ShorterProject import views
 from ShorterProject.views import home
 from ShorterProject.views import link
 from ShorterProject.views import stats
@@ -25,4 +27,5 @@ urlpatterns = [
     url(r'^$', home, name='home'),
     url(r'^(?P<id>[a-zA-Z0-9])$', link, name='link'),
     url(r'^(?P<id>\w+)/stats$', stats, name='stats'),
+    path('all/', views.all, name='all'),
 ]

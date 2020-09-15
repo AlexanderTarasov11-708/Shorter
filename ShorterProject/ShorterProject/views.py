@@ -57,6 +57,17 @@ def link(request, id):
 
     return redirect(link_db.link)
 
+def all(request):
+    """All links page
+
+    :param request: an HttpRequest object that contains metadata about the request
+    :return: provides a template of all links with data
+    """
+    all_results = models.Link.objects.all().order_by('-hits')  # Get all links from database and order them by
+    # num of redirects
+    # 'all' is a variable to let the template understand which tab to show
+    return render(request, "links.html",
+                  {"all_results": all_results, "all": "active"})
 
 def stats(request, id):
     db_id = models.Link.decode_id(id)

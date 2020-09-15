@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Сокращатель</title>
+    {% load bootstrap3 %}
+    {% bootstrap_css %}
+    {% bootstrap_javascript %}
+</head>
+<body>
+<nav class="navbar navbar-default">
+    <a class="navbar-brand" href="/">Shorter</a>
+    <ul class="nav navbar-nav">
+        <li><a>Все ссылки</a></li>
+    </ul>
+</nav>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="tab-content">
+                <div class="tab-pane {{ all }}" id="all">
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Оригинальная ссылка</th>
+                            <th scope="col">Сокращенная ссылка</th>
+                            <th scope="col">Кол-во переходов</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for item in all_results %}
+                            <tr>
+                                <th scope="row">{{ item.id }}</th>
+                                <td><a href="{{ item.original }}">{{ item.link }}</a></td>
+                                <td>
+                                    <a href="{{ request.scheme }}://{{ request.get_host }}/{{ item.get_short_id }}">{{ request.scheme }}://{{ request.get_host }}/{{ item.get_short_id}}</a>
+                                </td>
+                                <td>{{ item.hits }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
