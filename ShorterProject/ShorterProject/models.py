@@ -6,7 +6,6 @@ from django.db import models
 
 class Link(models.Model):
     link = models.URLField()
-    # Store the total redirects here so we don't need to do a possibly expensive SUM query on HitsDatePoint
     hash = models.CharField(max_length=6)
     hits = models.IntegerField(default=0)
 

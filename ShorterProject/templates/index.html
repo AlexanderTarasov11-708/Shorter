@@ -41,14 +41,13 @@
                                             {% if error %}
                                                 <span class="help-inline">Введите валидный Url</span>
                                             {% endif %}
+                                            <button type="submit" class="btn btn-success">Сократить</button>
                                         </div>
-                                    </div>
-                                    <div class="span2">
-                                        <button type="submit" class="btn btn-success">Сократить</button>
                                     </div>
                                 </div>
                             </form>
                         </div>
+                    <br>
                     {% if shorturl %}
                         <p>Сокращённый URL: <a href="{{ shorturl }}">{{ shorturl }}</a></p>
                     {% endif %}
