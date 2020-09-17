@@ -34,7 +34,7 @@
                                 <th scope="row">{{ item.id }}</th>
                                 <td><a href="{{ item.original }}">{{ item.link }}</a></td>
                                 <td>
-                                    <a href="{{ request.scheme }}://{{ request.get_host }}/{{ item.get_short_id }}">{{ request.scheme }}://{{ request.get_host }}/{{ item.get_short_id}}</a>
+                                    <a href="{{ request.scheme }}://{{ request.get_host }}/{{ item.hash }}">{{ request.scheme }}://{{ request.get_host }}/{{ item.hash}}</a>
                                 </td>
                                 <td>{{ item.hits }}</td>
                             </tr>

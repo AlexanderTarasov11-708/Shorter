@@ -19,13 +19,11 @@ from django.conf.urls import url
 
 from ShorterProject import views
 from ShorterProject.views import home
-from ShorterProject.views import link
-from ShorterProject.views import stats
+from ShorterProject.views import redir
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     url(r'^$', home, name='home'),
-    url(r'^(?P<id>[a-zA-Z0-9])$', link, name='link'),
-    url(r'^(?P<id>\w+)/stats$', stats, name='stats'),
+    url(r'^(?P<link_hash>[a-z0-9]+)$', views.redir, name='redir'),
     path('all/', views.all, name='all'),
 ]

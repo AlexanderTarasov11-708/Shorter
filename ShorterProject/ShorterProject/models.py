@@ -1,37 +1,20 @@
+import hashlib
+import os
+
 from django.db import models
-import string
-
-_char_map = [x for x in string.ascii_letters+string.digits]
-
-
-def index_to_char(sequence):
-    return "".join(_char_map[i] for i in sequence)
 
 
 class Link(models.Model):
     link = models.URLField()
     # Store the total redirects here so we don't need to do a possibly expensive SUM query on HitsDatePoint
+    hash = models.CharField(max_length=6)
     hits = models.IntegerField(default=0)
 
-    def __repr__(self):
-        return "<Link (Hits %s): %s>"%(self.hits, self.link)
-
-    def get_short_id(self):
-        _id = self.id
-        digits = []
-        while _id > 0:
-            rem = _id % 62
-            digits.append(rem)
-            _id //= 62
-        digits.reverse()
-        return index_to_char(digits)
-
-    @staticmethod
-    def decode_id(string):
-        i = 0
-        for c in string:
-            i = i * 62 + _char_map.index(c)
-        return i
+    def get_hash(self):
+        gen_salt = os.urandom(hashlib.blake2b.SALT_SIZE)  # Generated salt
+        key = hashlib.blake2b(salt=gen_salt, digest_size=3)
+        key.update(self.link.encode())  # Generated hash
+        return key.hexdigest()
 
 
 class HitsDatePoint(models.Model):

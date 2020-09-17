@@ -1,8 +1,9 @@
+from django.http import Http404
 from django.shortcuts import render, redirect, get_object_or_404
 from django.template import RequestContext
 from django.db.models import F
 from django.core.validators import URLValidator
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from ShorterProject import models
 import datetime
 import functools
@@ -27,8 +28,9 @@ def home(request):
         if not url_error:
             link_db = models.Link()
             link_db.link = url_input
+            link_db.hash = link_db.get_hash()
             link_db.save()
-            shortened_url = request.build_absolute_uri(link_db.get_short_id())
+            shortened_url = request.build_absolute_uri(link_db.hash)
             url_input = ""
             # shortened_url = "%s/%s"%(request.META["HTTP_HOST"], link_db.get_short_id())
 
@@ -36,46 +38,18 @@ def home(request):
                   {"error": url_error, "url": url_input, "shorturl": shortened_url})
 
 
-def link(request, id):
-    print(id)
-    db_id = models.Link.decode_id(id)
-    print(db_id)
-    link_db = get_object_or_404(models.Link, id=db_id)
+def redir(request, link_hash):
+    try:
+        link = models.Link.objects.get(hash=link_hash)
+        models.Link.objects.filter(hash=link_hash).update(hits=F('hits') + 1)
+        return redirect(link.link)
+    except ObjectDoesNotExist:
+        raise Http404()
 
-    models.Link.objects.filter(id=db_id).update(hits=F('hits') + 1)  # Update the link hits
-
-    if not models.HitsDatePoint.objects.filter(link=link_db, day=datetime.date.today()).exists():
-        x = models.HitsDatePoint()
-        x.day = datetime.date.today()
-        x.link = link_db
-        try:
-            x.save()
-        except Exception as e:
-            print("Possible corruption: %s" % e)
-
-    models.HitsDatePoint.objects.filter(day=datetime.date.today(), link=link_db).update(hits=F('hits') + 1)
-
-    return redirect(link_db.link)
 
 def all(request):
-    """All links page
-
-    :param request: an HttpRequest object that contains metadata about the request
-    :return: provides a template of all links with data
-    """
     all_results = models.Link.objects.all().order_by('-hits')  # Get all links from database and order them by
     # num of redirects
     # 'all' is a variable to let the template understand which tab to show
     return render(request, "links.html",
                   {"all_results": all_results, "all": "active"})
-
-def stats(request, id):
-    db_id = models.Link.decode_id(id)
-    link_db = get_object_or_404(models.Link, id=db_id)
-
-    stats = models.HitsDatePoint.objects.filter(day__gt=datetime.date.today() - datetime.timedelta(days=30),
-                                                link=link_db).all()
-
-    link_url = request.build_absolute_uri("/" + link_db.get_short_id())  # make it an absolute one
-
-    return render(request, "stats.html", {"stats": stats, "link": link_db, "link_url": link_url})
